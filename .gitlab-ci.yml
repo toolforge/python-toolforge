@@ -1,12 +1,13 @@
 stages:
   - test
+  - package
 
 test:tox:
   stage: test
-  image: python:$PYTHON_VERSIONS
+  image: python:$PYTHON_VERSION
   parallel:
     matrix:
-      - PYTHON_VERSIONS:
+      - PYTHON_VERSION:
         - "3.7"
         - "3.8"
         - "3.9"
@@ -15,3 +16,18 @@ test:tox:
   script:
     - python3 -m pip install --upgrade pip wheel tox
     - tox
+
+package:pypi:
+  stage: package
+  image: python:3.11
+  only:
+    - tags
+  needs:
+    - "test:tox"
+  script:
+    - python3 -m pip install --upgrade pip wheel build twine
+    - python3 -m build
+    - twine upload --non-interactive dist/*
+    # Set these envvars in [settings] > [ci/cd] > [variables]:
+    # - TWINE_USERNAME: __token__
+    # - TWINE_PASSWORD: pypi-...
