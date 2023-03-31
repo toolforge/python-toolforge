@@ -1,3 +1,14 @@
+6.0.0
+-----
+* [BREAKING] Drop Python versions 3.4, 3.5, 3.6
+* Add Python versions 3.10, 3.11
+* Move hosting to https://gitlab.wikimedia.org/toolforge-repos/python-toolforge
+* Convert build system from setuptools to hatchling
+* Use black for code formatting
+* Use isort for import formatting
+* Add a number of flake8 plugins including bugbear and spellcheck
+* Add CI support for publishing tagged versions to PyPi
+
 5.0.0
 -----
 * Fix pymysql dependency on Python 3.5 (AntiCompositeNumber)
