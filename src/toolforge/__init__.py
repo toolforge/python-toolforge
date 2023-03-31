@@ -18,12 +18,17 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 """
 import functools
 import os
-import pymysql
-import requests
 from typing import Optional
 
+import pymysql
+import requests
 
-def connect(dbname: str, cluster: str = 'web', **kwargs) -> pymysql.connections.Connection:
+
+def connect(
+    dbname: str,
+    cluster: str = "web",
+    **kwargs,
+) -> pymysql.connections.Connection:
     """
     Get a database connection for the
     specified wiki
@@ -32,32 +37,32 @@ def connect(dbname: str, cluster: str = 'web', **kwargs) -> pymysql.connections.
     :param kwargs: For pymysql.connect
     :return: pymysql connection
     """
-    if cluster not in ['analytics', 'web']:
+    if cluster not in ["analytics", "web"]:
         raise ValueError('"cluster" must be one of: "analytics", "web"')
 
-    domain = '{}.db.svc.wikimedia.cloud'.format(cluster)
+    domain = f"{cluster}.db.svc.wikimedia.cloud"
 
-    if dbname.endswith('_p'):
+    if dbname.endswith("_p"):
         dbname = dbname[:-2]
 
-    if dbname == 'meta':
-        host = 's7.{}'.format(domain)
+    if dbname == "meta":
+        host = f"s7.{domain}"
     else:
-        host = '{}.{}'.format(dbname, domain)
-    host = kwargs.pop('host', host)
+        host = f"{dbname}.{domain}"
+    host = kwargs.pop("host", host)
 
     return _connect(
-        database=dbname + '_p',
+        database=dbname + "_p",
         host=host,
-        **kwargs
+        **kwargs,
     )
 
 
 def _connect(*args, **kwargs) -> pymysql.connections.Connection:
     """Wraper for pymysql.connect to make testing easier."""
     kw = {
-        'read_default_file': os.path.expanduser("~/replica.my.cnf"),
-        'charset': 'utf8mb4',
+        "read_default_file": os.path.expanduser("~/replica.my.cnf"),
+        "charset": "utf8mb4",
     }
     kw.update(kwargs)
     return pymysql.connect(*args, **kw)  # type: ignore
@@ -72,8 +77,8 @@ def toolsdb(dbname: str, **kwargs) -> pymysql.connections.Connection:
     """
     return _connect(
         database=dbname,
-        host='tools.db.svc.eqiad.wmflabs',
-        **kwargs
+        host="tools.db.svc.eqiad.wmflabs",
+        **kwargs,
     )
 
 
@@ -82,36 +87,46 @@ def dbname(domain: str) -> str:
     Convert a domain/URL into its database name
     """
     # First, lets normalize the name.
-    if domain.startswith(('http://', 'https://')):
-        domain = domain.replace('http://', '', 1).replace('https://', '', 1)
-    if '/' in domain:
-        domain = domain.split('/', 1)[0]
+    if domain.startswith(("http://", "https://")):
+        domain = domain.replace("http://", "", 1).replace("https://", "", 1)
+    if "/" in domain:
+        domain = domain.split("/", 1)[0]
 
-    domain = 'https://' + domain
-    data = _fetch_sitematrix()['sitematrix']
+    domain = "https://" + domain
+    data = _fetch_sitematrix()["sitematrix"]
     for num in data:
         if num.isdigit():
-            for site in data[num]['site']:
-                if site['url'] == domain:
-                    return site['dbname']
-        elif num == 'specials':
+            for site in data[num]["site"]:
+                if site["url"] == domain:
+                    return site["dbname"]
+        elif num == "specials":
             for special in data[num]:
-                if special['url'] == domain:
-                    return special['dbname']
+                if special["url"] == domain:
+                    return special["dbname"]
 
-    raise ValueError('Unable to find database name')
+    raise ValueError("Unable to find database name")
 
 
 @functools.lru_cache()
 def _fetch_sitematrix():
-    params = {'action': 'sitematrix', 'format': 'json'}
-    headers = {'User-agent': 'https://wikitech.wikimedia.org/wiki/User:Legoktm/toolforge_library'}
-    r = requests.get('https://meta.wikimedia.org/w/api.php', params=params, headers=headers)
+    params = {"action": "sitematrix", "format": "json"}
+    headers = {
+        "User-agent": "https://wikitech.wikimedia.org/wiki/User:Legoktm/toolforge_library",
+    }
+    r = requests.get(
+        "https://meta.wikimedia.org/w/api.php",
+        params=params,
+        headers=headers,
+    )
     r.raise_for_status()
     return r.json()
 
 
-def set_user_agent(tool: str, url: Optional[str] = None, email: Optional[str] = None) -> str:
+def set_user_agent(
+    tool: str,
+    url: Optional[str] = None,
+    email: Optional[str] = None,
+) -> str:
     """
     Set the default requests user-agent to a better
     one in accordance with
@@ -122,10 +137,10 @@ def set_user_agent(tool: str, url: Optional[str] = None, email: Optional[str] = 
     :return New User-agent value
     """
     if url is None:
-        url = 'https://{}.toolforge.org/'.format(tool)
+        url = f"https://{tool}.toolforge.org/"
     if email is None:
-        email = 'tools.{}@tools.wmflabs.org'.format(tool)
+        email = f"tools.{tool}@tools.wmflabs.org"
 
-    ua = '{} ({}; {}) python-requests/{}'.format(tool, url, email, requests.__version__)
-    requests.utils.default_user_agent = lambda *args, **kwargs: ua
+    ua = f"{tool} ({url}; {email}) python-requests/{requests.__version__}"
+    requests.utils.default_user_agent = lambda *args, **kwargs: ua  # noqa: U100
     return ua

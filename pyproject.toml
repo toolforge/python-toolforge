@@ -63,3 +63,12 @@ source = "vcs"
 [tool.mypy]
 python_version = "3.11"
 show_error_codes = true
+
+[tool.black]
+line_length = 88
+target_version = ["py37"]
+
+[tool.isort]
+known_first_party = ["toolforge", "tests"]
+line_length = 88
+profile = "black"
