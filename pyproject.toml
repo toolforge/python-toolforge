@@ -44,7 +44,8 @@ dependencies = [
 ]
 
 [project.urls]
-Homepage = "https://wikitech.wikimedia.org/wiki/User:Legoktm/toolforge_library"
+Documentation = "https://python-toolforge.readthedocs.io/"
+Changelog = "https://gitlab.wikimedia.org/toolforge-repos/python-toolforge/-/blob/main/HISTORY.rst"
 "Bug Tracker" = "https://phabricator.wikimedia.org/tag/tool-python-toolforge/"
 Source = "https://gitlab.wikimedia.org/toolforge-repos/python-toolforge"
 

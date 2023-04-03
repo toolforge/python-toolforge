@@ -1,3 +1,8 @@
+UNRELEASED
+----------
+* Add project documentation built with sphinx
+* Publish project documentation at https://python-toolforge.readthedocs.io/
+
 6.0.0
 -----
 * [BREAKING] Drop Python versions 3.4, 3.5, 3.6
