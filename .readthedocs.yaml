@@ -5,7 +5,7 @@ build:
   tools:
     python: "3.11"
   commands:
-    - git update-index --assume-unchanged environment.yml docs/conf.py
+    - git update-index --assume-unchanged docs/conf.py
     - pip install -U tox
     - tox -e docs
     - mkdir --parents _readthedocs/html/
