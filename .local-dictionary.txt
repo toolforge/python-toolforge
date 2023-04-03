@@ -1,9 +1,16 @@
+Kunal
+MERCHANTABILITY
+Mehta
 dbname
 func
+intersphinx
+legoktm
 lru
 num
 params
+pygments
 pymysql
+rtd
 sitematrix
 toolforge
 toolsdb
