@@ -8,7 +8,12 @@ common tasks that Toolforge_ users might encounter.
 
    usage
    contributing
-   license
    api
+
+.. toctree::
+   :maxdepth: 1
+
+   changes
+   license
 
 .. _Toolforge: https://wikitech.wikimedia.org/wiki/Portal:Toolforge
