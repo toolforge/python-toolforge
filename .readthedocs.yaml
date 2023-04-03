@@ -4,10 +4,8 @@ build:
   os: ubuntu-22.04
   tools:
     python: "3.11"
-  jobs:
-    pre_install:
-      - git update-index --assume-unchanged environment.yml docs/conf.py
   commands:
+    - git update-index --assume-unchanged environment.yml docs/conf.py
     - pip install -U tox
     - tox -e docs
     - mkdir --parents _readthedocs/html/
