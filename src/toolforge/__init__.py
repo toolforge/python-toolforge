@@ -1,20 +1,20 @@
-#!/usr/bin/env python
+# This file is part of Toolforge python helper library
+# Copyright (C) 2013, 2017 Kunal Mehta <legoktm@debian.org>
+#
+# This program is free software: you can redistribute it and/or modify
+# it under the terms of the GNU General Public License as published by
+# the Free Software Foundation, either version 3 of the License, or
+# (at your option) any later version.
+#
+# This program is distributed in the hope that it will be useful,
+# but WITHOUT ANY WARRANTY; without even the implied warranty of
+# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+# GNU General Public License for more details.
+#
+# You should have received a copy of the GNU General Public License
+# along with this program.  If not, see <http://www.gnu.org/licenses/>.
 """
 Small library for common tasks on Wikimedia Toolforge
-Copyright (C) 2013, 2017 Kunal Mehta <legoktm@debian.org>
-
-This program is free software: you can redistribute it and/or modify
-it under the terms of the GNU General Public License as published by
-the Free Software Foundation, either version 3 of the License, or
-(at your option) any later version.
-
-This program is distributed in the hope that it will be useful,
-but WITHOUT ANY WARRANTY; without even the implied warranty of
-MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-GNU General Public License for more details.
-
-You should have received a copy of the GNU General Public License
-along with this program.  If not, see <http://www.gnu.org/licenses/>.
 """
 import functools
 import os
@@ -30,12 +30,13 @@ def connect(
     **kwargs,
 ) -> pymysql.connections.Connection:
     """
-    Get a database connection for the
-    specified wiki
+    Get a database connection for the specified wiki.
+
     :param dbname: Database name
-    :param cluster: Database cluster (analytics or web)
-    :param kwargs: For pymysql.connect
-    :return: pymysql connection
+    :param cluster: Database cluster (*analytics* or *web*)
+    :param `**kwargs`: For :meth:`pymysql.connect <pymysql.connections.Connection.__init__>`
+    :return: :class:`pymysql.connections.Connection`
+    :raise: :class:`ValueError`: When **cluster** value is unknown
     """
     if cluster not in ["analytics", "web"]:
         raise ValueError('"cluster" must be one of: "analytics", "web"')
@@ -69,11 +70,11 @@ def _connect(*args, **kwargs) -> pymysql.connections.Connection:
 
 
 def toolsdb(dbname: str, **kwargs) -> pymysql.connections.Connection:
-    """Connect to a database hosted on the toolsdb cluster.
+    """Connect to a database hosted on the ToolsDB service.
 
     :param dbname: Database name
-    :param kwargs: For pymysql.connect
-    :return: pymysql connection
+    :param `**kwargs`: For :meth:`pymysql.connect <pymysql.connections.Connection.__init__>`
+    :return: :class:`pymysql.connections.Connection`
     """
     return _connect(
         database=dbname,
@@ -84,7 +85,11 @@ def toolsdb(dbname: str, **kwargs) -> pymysql.connections.Connection:
 
 def dbname(domain: str) -> str:
     """
-    Convert a domain/URL into its database name
+    Convert a domain/URL into its database name.
+
+    :param domain: DNS domain or URL to wiki
+    :return: Wikimedia database name (like *enwiki*)
+    :raises: :class:`ValueError`: When dbname mapping for domain is unknown
     """
     # First, lets normalize the name.
     if domain.startswith(("http://", "https://")):
@@ -128,13 +133,14 @@ def set_user_agent(
     email: Optional[str] = None,
 ) -> str:
     """
-    Set the default requests user-agent to a better
-    one in accordance with
-    <https://meta.wikimedia.org/wiki/User-Agent_policy>
+    Set the default `requests <https://requests.readthedocs.io/>`_ user-agent
+    to a better one in accordance with `[[meta:User-Agent policy]]
+    <https://meta.wikimedia.org/wiki/User-Agent_policy>`_.
+
     :param tool: Toolforge tool name
     :param url: Optional URL
     :param email: Optional email
-    :return New User-agent value
+    :return: New User-agent value
     """
     if url is None:
         url = f"https://{tool}.toolforge.org/"
