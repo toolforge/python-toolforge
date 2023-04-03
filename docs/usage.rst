@@ -53,7 +53,7 @@ User-Agent policy`_:
 
    toolforge.set_user_agent("mycooltool")
    # Sets user-agent to:
-   # mycooltool (https://mycooltool.toolforge.org/; tools.mycooltool@tools.wmflabs.org) python-requests/2.28.2
+   # mycooltool (https://mycooltool.toolforge.org/; tools.mycooltool@toolforge.org) python-requests/2.28.2
    requests.get("...")
 
 

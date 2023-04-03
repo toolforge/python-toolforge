@@ -29,7 +29,7 @@ class TestMain:
         requests.__version__ = "2.13.0"
         expected = (
             "mycooltool (https://mycooltool.toolforge.org/; "
-            + "tools.mycooltool@tools.wmflabs.org) python-requests/2.13.0"
+            + "tools.mycooltool@toolforge.org) python-requests/2.13.0"
         )
         ua = toolforge.set_user_agent("mycooltool")
         assert ua == expected
