@@ -145,7 +145,7 @@ def set_user_agent(
     if url is None:
         url = f"https://{tool}.toolforge.org/"
     if email is None:
-        email = f"tools.{tool}@tools.wmflabs.org"
+        email = f"tools.{tool}@toolforge.org"
 
     ua = f"{tool} ({url}; {email}) python-requests/{requests.__version__}"
     requests.utils.default_user_agent = lambda *args, **kwargs: ua  # noqa: U100

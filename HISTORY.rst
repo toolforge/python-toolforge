@@ -2,6 +2,7 @@ UNRELEASED
 ----------
 * Add project documentation built with sphinx
 * Publish project documentation at https://python-toolforge.readthedocs.io/
+* Update generated User-Agent header to use toolforge.org email address.
 
 6.0.0
 -----
