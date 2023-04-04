@@ -21,15 +21,20 @@ be installed directly from the git repository:
 
     python3 -m pip install --upgrade git+https://gitlab.wikimedia.org/toolforge-repos/python-toolforge.git
 
-Bug reports
------------
+Usage
+-----
 
-Please report bugs and feature requests at https://phabricator.wikimedia.org/tag/tool-python-toolforge/.
+See the `API reference and user guide`_ for usage instructions.
 
 Contributing
 ------------
 
 See CONTRIBUTING.rst_ for guidelines on contributing to ``toolforge``.
+
+Bug reports
+-----------
+
+Please report bugs and feature requests at https://phabricator.wikimedia.org/tag/tool-python-toolforge/.
 
 License
 -------
@@ -39,6 +44,7 @@ license.
 
 .. _Toolforge: https://wikitech.wikimedia.org/wiki/Portal:Toolforge
 .. _gitlab.wikimedia.org: https://gitlab.wikimedia.org/toolforge-repos/python-toolforge
+.. _API reference and user guide: https://python-toolforge.readthedocs.io/
 .. _CONTRIBUTING.rst: https://gitlab.wikimedia.org/toolforge-repos/python-toolforge/-/blob/main/CONTRIBUTING.rst
 .. _GPL-3.0-or-later: https://www.gnu.org/licenses/gpl-3.0.html
 .. _COPYING: https://gitlab.wikimedia.org/toolforge-repos/python-toolforge/-/blob/main/COPYING
