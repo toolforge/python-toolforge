@@ -16,6 +16,7 @@ extensions = [
 intersphinx_mapping = {
     "python": ("https://docs.python.org/3/", None),
     "pymysql": ("https://pymysql.readthedocs.io/en/latest/", None),
+    "requests": ("https://requests.readthedocs.io/en/latest/", None),
 }
 
 # -- Project information -----------------------------------------------------
