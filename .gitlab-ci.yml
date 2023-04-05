@@ -3,7 +3,7 @@ stages:
   - package
 
 variables:
-  PYTHONBUFFERED: "1"
+  PYTHONUNBUFFERED: "1"
   PYTHONDONTWRITEBYTECODE: "1"
   PIP_CACHE_DIR: "$CI_PROJECT_DIR/.cache/pip"
 
