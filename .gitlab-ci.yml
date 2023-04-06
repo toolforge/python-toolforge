@@ -26,6 +26,11 @@ test:tox:
     - python3 --version
     - python3 -m pip install --upgrade pip wheel tox
     - tox
+  artifacts:
+    reports:
+      coverage_report:
+        coverage_format: cobertura
+        path: dist/coverage.xml
 
 package:pypi:
   stage: package
