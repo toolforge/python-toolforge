@@ -78,7 +78,7 @@ def toolsdb(dbname: str, **kwargs) -> pymysql.connections.Connection:
     """
     return _connect(
         database=dbname,
-        host="tools.db.svc.eqiad.wmflabs",
+        host="tools.db.svc.wikimedia.cloud",
         **kwargs,
     )
 
