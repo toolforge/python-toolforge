@@ -90,14 +90,14 @@ class TestMain:
                 ["s12345__foo"],
                 {
                     "database": "s12345__foo",
-                    "host": "tools.db.svc.eqiad.wmflabs",
+                    "host": "tools.db.svc.wikimedia.cloud",
                 },
             ),
             (
                 ["s12345__foo_p"],
                 {
                     "database": "s12345__foo_p",
-                    "host": "tools.db.svc.eqiad.wmflabs",
+                    "host": "tools.db.svc.wikimedia.cloud",
                 },
             ),
         ],

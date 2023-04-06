@@ -3,6 +3,7 @@ UNRELEASED
 * Add project documentation built with sphinx
 * Publish project documentation at https://python-toolforge.readthedocs.io/
 * Update generated User-Agent header to use toolforge.org email address.
+* Update ToolsDB hostname to "tools.db.svc.wikimedia.cloud"
 
 6.0.0
 -----
