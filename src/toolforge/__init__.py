@@ -23,7 +23,8 @@ from typing import Optional
 import pymysql
 import requests
 
-from .exceptions import UnknownClusterError, UnknownDatabaseError
+from .exceptions import UnknownClusterError
+from .exceptions import UnknownDatabaseError
 
 
 def connect(
