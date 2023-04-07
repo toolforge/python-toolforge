@@ -19,27 +19,38 @@ class TestMain:
             ("www.wikidata.org", "wikidatawiki"),
             ("http://commons.wikimedia.org", "commonswiki"),
             ("en.wikisource.org/wiki/Article", "enwikisource"),
+            ("https://wikimania2018.wikimedia.org", "wikimania2018wiki"),
         ],
     )
     def test_dbname(self, domain, dbname):
         assert toolforge.dbname(domain) == dbname
 
-    def test_set_user_agent(self):
-        orig = requests.__version__
-        requests.__version__ = "2.13.0"
-        expected = (
-            "mycooltool (https://mycooltool.toolforge.org/; "
-            + "tools.mycooltool@toolforge.org) python-requests/2.13.0"
-        )
-        ua = toolforge.set_user_agent("mycooltool")
+    def test_dbname_throws_for_unknown(self):
+        with pytest.raises(ValueError):  # noqa: PT011
+            toolforge.dbname("toolforge.org")
+
+    @pytest.mark.parametrize(
+        ("tool", "url", "email", "expect"),
+        [
+            (
+                "mycooltool",
+                None,
+                None,
+                "mycooltool (https://mycooltool.toolforge.org/; tools.mycooltool@toolforge.org)",
+            ),
+            ("test", "test", "test", "test (test; test)"),
+        ],
+    )
+    def test_set_user_agent(self, tool, url, email, expect):
+        expected = f"{expect} python-requests/{requests.__version__}"
+        ua = toolforge.set_user_agent(tool, url, email)
         assert ua == expected
         # Allow calling set_user_agent twice (see #14)
-        ua2 = toolforge.set_user_agent("mycooltool")
+        ua2 = toolforge.set_user_agent(tool, url, email)
         assert ua2 == expected
         assert requests.get("https://httpbin.org/user-agent").json() == {
             "user-agent": expected,
         }
-        requests.__version__ = orig
 
     @pytest.mark.parametrize(
         ("args", "expects"),
@@ -65,6 +76,13 @@ class TestMain:
                     "host": "enwiki.analytics.db.svc.wikimedia.cloud",
                 },
             ),
+            (
+                ["meta", "analytics"],
+                {
+                    "database": "meta_p",
+                    "host": "s7.analytics.db.svc.wikimedia.cloud",
+                },
+            ),
         ],
     )
     def test_connect(self, mocker, args, expects):
@@ -82,6 +100,15 @@ class TestMain:
         conn = func(*args)
         assert conn is None
         mm.assert_called_once_with(**expect)
+
+    def test_connect_rejects_unknown_cluster(self, mocker):
+        with pytest.raises(ValueError):  # noqa: PT011
+            self._assert_connect(
+                mocker,
+                toolforge.connect,
+                ["ignored", "not web or analytics"],
+                {"ignored": "ignored"},
+            )
 
     @pytest.mark.parametrize(
         ("args", "expects"),

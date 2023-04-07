@@ -59,7 +59,7 @@ def connect(
     )
 
 
-def _connect(*args, **kwargs) -> pymysql.connections.Connection:
+def _connect(*args, **kwargs) -> pymysql.connections.Connection:  # pragma: no cover
     """Wraper for pymysql.connect to make testing easier."""
     kw = {
         "read_default_file": os.path.expanduser("~/replica.my.cnf"),
