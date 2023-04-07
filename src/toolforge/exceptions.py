@@ -28,3 +28,16 @@ class UnknownDatabaseError(ValueError):
     """Raised when a dbname cannot determined for a value."""
 
     # pass
+
+
+class PrivateFileWorldReadableError(ValueError):
+    """
+    Raised when a function decorated with :func:`assert_private_file`
+    encounters a world-readable file.
+    """
+
+    def __init__(self, f):
+        super().__init__(
+            f"{getattr(f, 'name', 'config file')} should be private, "
+            "but is currently world-readable!",
+        )

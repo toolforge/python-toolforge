@@ -11,6 +11,8 @@ toolforge package
     :inherited-members:
     :show-inheritance:
 
+.. autoexception:: toolforge.PrivateFileWorldReadableError
+
 .. autoexception:: toolforge.UnknownClusterError
 
 .. autoexception:: toolforge.UnknownDatabaseError

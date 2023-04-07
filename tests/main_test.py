@@ -1,4 +1,6 @@
 #!/usr/bin/env python
+import io
+import json
 
 import pytest
 import requests
@@ -131,3 +133,64 @@ class TestMain:
     )
     def test_toolsdb(self, mocker, args, expects):
         self._assert_connect(mocker, toolforge.toolsdb, args, expects)
+
+    def test_assert_private_file_no_args(self, mocker):
+        load = mocker.Mock(
+            return_value="data",
+            # these attributes (used by decorator) are not mocked automatically
+            __name__="name",
+            __qualname__="qualname",
+        )
+        data = toolforge.assert_private_file(load)()
+        assert data == "data"
+        load.assert_called_once_with()
+
+    def test_assert_private_file_non_io(self, mocker):
+        stream = mocker.Mock(spec=[])  # empty spec = no fileno
+        load = mocker.Mock(
+            return_value="data",
+            __name__="name",
+            __qualname__="qualname",
+        )
+        data = toolforge.assert_private_file(load)(stream)
+        assert data == "data"
+        load.assert_called_once_with(stream)
+
+    def test_assert_private_file_non_file(self):
+        stream = io.StringIO('{"a": "b"}')
+        data = toolforge.assert_private_file(json.load)(stream)
+        assert data == {"a": "b"}
+
+    @pytest.mark.parametrize("mode", [0o600, 0o640])
+    def test_assert_private_file_non_world_readable(self, tmp_path, mode):
+        tmp_file_path = tmp_path / "config.json"
+        tmp_file_path.write_text('{"a": "b"}')
+        tmp_file_path.chmod(mode)
+        with tmp_file_path.open() as tmp_file:
+            data = toolforge.assert_private_file(json.load)(tmp_file)
+        assert data == {"a": "b"}
+
+    def test_assert_private_file_world_readable(self, tmp_path):
+        tmp_file_path = tmp_path / "config.json"
+        tmp_file_path.write_text('{"a": "b"}')
+        tmp_file_path.chmod(0o644)
+        with tmp_file_path.open() as tmp_file:
+            with pytest.raises(toolforge.exceptions.PrivateFileWorldReadableError):
+                toolforge.assert_private_file(json.load)(tmp_file)
+
+    @pytest.mark.parametrize("mode", [0o600, 0o640])
+    def test_load_private_yaml_non_world_readable(self, tmp_path, mode):
+        tmp_file_path = tmp_path / "config.yaml"
+        tmp_file_path.write_text('{"a": "b"}')
+        tmp_file_path.chmod(mode)
+        with tmp_file_path.open() as tmp_file:
+            data = toolforge.load_private_yaml(tmp_file)
+        assert data == {"a": "b"}
+
+    def test_load_private_yaml_world_readable(self, tmp_path):
+        tmp_file_path = tmp_path / "config.yaml"
+        tmp_file_path.write_text('{"a": "b"}')
+        tmp_file_path.chmod(0o644)
+        with tmp_file_path.open() as tmp_file:
+            with pytest.raises(toolforge.exceptions.PrivateFileWorldReadableError):
+                toolforge.load_private_yaml(tmp_file)
