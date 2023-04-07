@@ -23,6 +23,8 @@ from typing import Optional
 import pymysql
 import requests
 
+from .exceptions import UnknownClusterError, UnknownDatabaseError
+
 
 def connect(
     dbname: str,
@@ -36,10 +38,10 @@ def connect(
     :param cluster: Database cluster (*analytics* or *web*)
     :param `**kwargs`: For :meth:`pymysql.connect <pymysql.connections.Connection.__init__>`
     :return: :class:`pymysql.connections.Connection`
-    :raise: :class:`ValueError`: When **cluster** value is unknown
+    :raise: :class:`toolforge.UnknownClusterError`: When **cluster** value is unknown
     """
     if cluster not in ["analytics", "web"]:
-        raise ValueError('"cluster" must be one of: "analytics", "web"')
+        raise UnknownClusterError('"cluster" must be one of: "analytics", "web"')
 
     domain = f"{cluster}.db.svc.wikimedia.cloud"
 
@@ -89,7 +91,7 @@ def dbname(domain: str) -> str:
 
     :param domain: DNS domain or URL to wiki
     :return: Wikimedia database name (like *enwiki*)
-    :raises: :class:`ValueError`: When dbname mapping for domain is unknown
+    :raises: :class:`toolforge.UnknownDatabaseError`: When dbname mapping for domain is unknown
     """
     # First, lets normalize the name.
     if domain.startswith(("http://", "https://")):
@@ -109,7 +111,7 @@ def dbname(domain: str) -> str:
                 if special["url"] == domain:
                     return special["dbname"]
 
-    raise ValueError("Unable to find database name")
+    raise UnknownDatabaseError(f"Unable to find database name for {domain}")
 
 
 @functools.lru_cache()

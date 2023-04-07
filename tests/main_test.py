@@ -26,7 +26,7 @@ class TestMain:
         assert toolforge.dbname(domain) == dbname
 
     def test_dbname_throws_for_unknown(self):
-        with pytest.raises(ValueError):  # noqa: PT011
+        with pytest.raises(toolforge.UnknownDatabaseError):
             toolforge.dbname("toolforge.org")
 
     @pytest.mark.parametrize(
@@ -102,7 +102,7 @@ class TestMain:
         mm.assert_called_once_with(**expect)
 
     def test_connect_rejects_unknown_cluster(self, mocker):
-        with pytest.raises(ValueError):  # noqa: PT011
+        with pytest.raises(toolforge.UnknownClusterError):
             self._assert_connect(
                 mocker,
                 toolforge.connect,

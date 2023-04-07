@@ -10,3 +10,7 @@ toolforge package
     :members:
     :inherited-members:
     :show-inheritance:
+
+.. autoexception:: toolforge.UnknownClusterError
+
+.. autoexception:: toolforge.UnknownDatabaseError
