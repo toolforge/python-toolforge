@@ -16,7 +16,9 @@
 """
 Typed exceptions
 """
+from __future__ import annotations  # PEP 563
 
+from typing import Any
 from typing import IO
 
 
@@ -34,11 +36,11 @@ class UnknownDatabaseError(ValueError):
 
 class PrivateFileWorldReadableError(ValueError):
     """
-    Raised when a function decorated with :func:`assert_private_file`
+    Raised when a function decorated with :func:`toolforge.assert_private_file`
     encounters a world-readable file.
     """
 
-    def __init__(self, f: IO) -> None:
+    def __init__(self, f: IO[Any]) -> None:
         super().__init__(
             f"{getattr(f, 'name', 'config file')} should be private, "
             "but is currently world-readable!",

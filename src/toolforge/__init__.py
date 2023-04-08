@@ -16,13 +16,16 @@
 """
 Small library for common tasks on Wikimedia Toolforge
 """
+from __future__ import annotations  # PEP 563
+
 import functools
 import os
 import stat
-from typing import IO
 from typing import Any
 from typing import Callable
-from typing import Optional
+from typing import IO
+from typing import NewType
+from typing import cast
 
 import decorator
 import pymysql
@@ -32,12 +35,13 @@ from .exceptions import PrivateFileWorldReadableError
 from .exceptions import UnknownClusterError
 from .exceptions import UnknownDatabaseError
 
+_Connection = NewType(
+    "_Connection",
+    "pymysql.connections.Connection[pymysql.cursors.Cursor]",
+)
 
-def connect(
-    dbname: str,
-    cluster: str = "web",
-    **kwargs,
-) -> pymysql.connections.Connection:
+
+def connect(dbname: str, cluster: str = "web", **kwargs: str) -> _Connection:
     """
     Get a database connection for the specified wiki.
 
@@ -68,7 +72,7 @@ def connect(
     )
 
 
-def _connect(*args, **kwargs) -> pymysql.connections.Connection:  # pragma: no cover
+def _connect(*args: str, **kwargs: str) -> _Connection:  # pragma: no cover
     """Wraper for pymysql.connect to make testing easier."""
     kw = {
         "read_default_file": os.path.expanduser("~/replica.my.cnf"),
@@ -78,7 +82,7 @@ def _connect(*args, **kwargs) -> pymysql.connections.Connection:  # pragma: no c
     return pymysql.connect(*args, **kw)  # type: ignore
 
 
-def toolsdb(dbname: str, **kwargs) -> pymysql.connections.Connection:
+def toolsdb(dbname: str, **kwargs: str) -> _Connection:
     """Connect to a database hosted on the ToolsDB service.
 
     :param dbname: Database name
@@ -112,17 +116,17 @@ def dbname(domain: str) -> str:
         if num.isdigit():
             for site in data[num]["site"]:
                 if site["url"] == domain:
-                    return site["dbname"]
+                    return cast(str, site["dbname"])
         elif num == "specials":
             for special in data[num]:
                 if special["url"] == domain:
-                    return special["dbname"]
+                    return cast(str, special["dbname"])
 
     raise UnknownDatabaseError(f"Unable to find database name for {domain}")
 
 
 @functools.lru_cache()
-def _fetch_sitematrix():
+def _fetch_sitematrix() -> Any:
     params = {"action": "sitematrix", "format": "json"}
     headers = {
         "User-agent": "https://wikitech.wikimedia.org/wiki/User:Legoktm/toolforge_library",
@@ -138,8 +142,8 @@ def _fetch_sitematrix():
 
 def set_user_agent(
     tool: str,
-    url: Optional[str] = None,
-    email: Optional[str] = None,
+    url: str | None = None,
+    email: str | None = None,
 ) -> str:
     """
     Set the default `requests <https://requests.readthedocs.io/>`_ user-agent
@@ -161,7 +165,21 @@ def set_user_agent(
     return ua
 
 
-def _assert_private_file(func, *args, **kwargs):
+def _assert_private_file(
+    func: Callable[[IO[Any]], Any],
+    *args: Any,
+    **kwargs: Any,
+) -> Any:
+    """Ensure that if args[0] is a file handle it points to a non-world
+    readable file.
+
+    :param func: callable to decorate
+    :param `*args`: positional arguments to func
+    :param `**kwargs`: named arguments to func
+    :return: `func(*args, **kwargs)` result
+    :raise: :class:`toolforge.PrivateFileWorldReadableError`: When `args[0]`
+            is a world readable file.
+    """
     try:
         f = args[0]
         fd = f.fileno()
@@ -178,8 +196,13 @@ def _assert_private_file(func, *args, **kwargs):
     return func(*args, **kwargs)
 
 
-def assert_private_file(func):
-    """Decorator to assert that a file is not world-readable."""
+def assert_private_file(func: Callable[[IO[Any]], Any]) -> Callable[[IO[Any]], Any]:
+    """Decorator to assert that a file is not world-readable.
+
+    :param func: callable to decorate
+    :raise: :class:`toolforge.PrivateFileWorldReadableError`: When
+            `func.args[0]` is a world readable file.
+    """
     decorated = decorator.decorate(func, _assert_private_file)
     decorated.__doc__ = (
         (decorated.__doc__ or "")
@@ -196,6 +219,6 @@ try:
 except ModuleNotFoundError:
     pass
 else:
-    load_private_yaml: Callable[[IO], Any] = assert_private_file(yaml.safe_load)
+    load_private_yaml: Callable[[IO[Any]], Any] = assert_private_file(yaml.safe_load)
     load_private_yaml.__name__ = "load_private_yaml"
     load_private_yaml.__module__ = "toolforge"
