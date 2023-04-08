@@ -98,8 +98,56 @@ returns the string to use:
           user_agent = toolforge.set_user_agent("...")
           existing_session.headers["User-Agent"] = user_agent
 
+Loading configuration files
+---------------------------
+
+To load configuration files with potentially sensitive information
+(e.g. OAuth credentials), you can use the :meth:`toolforge.assert_private_file`
+decorator to wrap any other "load"-like function,
+for example from the standard library ``json`` module:
+
+.. code-block:: python
+
+   import json
+   import toolforge
+
+   with open("config.json", "r") as f:
+       config = toolforge.assert_private_file(json.load)(f)
+
+This will ensure that the config file is not world-readable,
+and raise a :class:`toolforge.exceptions.PrivateFileWorldReadableError` if it is.
+In that case, you should recreate the config file and replace all secrets in it.
+
+.. code-block:: shell
+
+   mv config.yaml config.yaml.leaked
+   install -m600 /dev/null config.yaml
+   # edit config.yaml
+
+If you use a YAML configuration file and install the PyYAML_ library,
+you can also use the :meth:`toolforge.load_private_yaml` function directly:
+
+.. code-block:: python
+
+   import toolforge
+
+   with open("config.yaml", "r") as f:
+       config = toolforge.load_private_yaml(f)
+
+Note that PyYAML is not a dependency of the ``toolforge`` library,
+and the function will only be available if PyYAML is otherwise installed.
+You should add it to your ``pyproject.toml``, ``requirements.txt`` or other dependency list if you want to use it.
+
+In a Flask_ tool, you can load the configuration like this:
+
+.. code-block:: python
+
+   app.config.from_file("config.yaml", load=toolforge.load_private_yaml)
+
 .. _gitlab.wikimedia.org: https://gitlab.wikimedia.org/toolforge-repos/python-toolforge
 .. _Wiki Replicas: https://wikitech.wikimedia.org/wiki/Wiki_Replicas
 .. _connection handling policy: https://wikitech.wikimedia.org/wiki/Help:Toolforge/Database#Connection_handling_policy
 .. _Requests: https://requests.readthedocs.io/
 .. _Wikimedia User-Agent policy: https://meta.wikimedia.org/wiki/User-Agent_policy
+.. _PyYAML: https://pyyaml.org/
+.. _Flask: https://flask.palletsprojects.com/
