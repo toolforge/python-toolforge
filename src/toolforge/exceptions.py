@@ -17,6 +17,8 @@
 Typed exceptions
 """
 
+from typing import IO
+
 
 class UnknownClusterError(ValueError):
     """Raised when an unknown "cluster" value is encountered."""
@@ -36,7 +38,7 @@ class PrivateFileWorldReadableError(ValueError):
     encounters a world-readable file.
     """
 
-    def __init__(self, f):
+    def __init__(self, f: IO) -> None:
         super().__init__(
             f"{getattr(f, 'name', 'config file')} should be private, "
             "but is currently world-readable!",

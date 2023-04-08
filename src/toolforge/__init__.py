@@ -19,6 +19,9 @@ Small library for common tasks on Wikimedia Toolforge
 import functools
 import os
 import stat
+from typing import IO
+from typing import Any
+from typing import Callable
 from typing import Optional
 
 import decorator
@@ -175,9 +178,9 @@ def _assert_private_file(func, *args, **kwargs):
     return func(*args, **kwargs)
 
 
-def assert_private_file(f):
+def assert_private_file(func):
     """Decorator to assert that a file is not world-readable."""
-    decorated = decorator.decorate(f, _assert_private_file)
+    decorated = decorator.decorate(func, _assert_private_file)
     decorated.__doc__ = (
         (decorated.__doc__ or "")
         + """
@@ -193,6 +196,6 @@ try:
 except ModuleNotFoundError:
     pass
 else:
-    load_private_yaml = assert_private_file(yaml.safe_load)
+    load_private_yaml: Callable[[IO], Any] = assert_private_file(yaml.safe_load)
     load_private_yaml.__name__ = "load_private_yaml"
     load_private_yaml.__module__ = "toolforge"
