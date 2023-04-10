@@ -1,7 +1,10 @@
+IROTH
 Kunal
 MERCHANTABILITY
 Mehta
+PrivateFileWorldReadableError
 dbname
+fileno
 func
 intersphinx
 legoktm
@@ -10,8 +13,10 @@ num
 params
 pygments
 pymysql
+qualname
 rtd
 sitematrix
+tmp
 toolforge
 toolsdb
 ua
