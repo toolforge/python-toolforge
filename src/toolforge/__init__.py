@@ -129,7 +129,7 @@ def dbname(domain: str) -> str:
 def _fetch_sitematrix() -> Any:
     params = {"action": "sitematrix", "format": "json"}
     headers = {
-        "User-agent": "https://wikitech.wikimedia.org/wiki/User:Legoktm/toolforge_library",
+        "User-agent": f"python-toolforge python-requests/{requests.__version__}",
     }
     r = requests.get(
         "https://meta.wikimedia.org/w/api.php",
