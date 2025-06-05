@@ -50,7 +50,7 @@ class TestMain:
         # Allow calling set_user_agent twice (see #14)
         ua2 = toolforge.set_user_agent(tool, url, email)
         assert ua2 == expected
-        assert requests.get("https://httpbin.org/user-agent").json() == {
+        assert requests.get("https://httpbin.io/user-agent").json() == {
             "user-agent": expected,
         }
 
