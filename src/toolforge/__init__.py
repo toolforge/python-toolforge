@@ -25,6 +25,7 @@ from typing import Any
 from typing import Callable
 from typing import IO
 from typing import NewType
+from typing import Optional
 from typing import cast
 
 import decorator
@@ -41,7 +42,13 @@ _Connection = NewType(
 )
 
 
-def connect(dbname: str, cluster: str = "web", **kwargs: str) -> _Connection:
+def connect(
+    dbname: str,
+    cluster: str = "web",
+    *,
+    extension: Optional[str] = None,
+    **kwargs: str,
+) -> _Connection:
     """
     Get a database connection for the specified wiki.
 
@@ -63,6 +70,8 @@ def connect(dbname: str, cluster: str = "web", **kwargs: str) -> _Connection:
         host = f"s7.{domain}"
     else:
         host = f"{dbname}.{domain}"
+    if extension is not None:
+        host = f"{extension}.{host}"
     host = kwargs.pop("host", host)
 
     return _connect(

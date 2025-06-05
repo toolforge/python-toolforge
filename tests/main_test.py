@@ -55,10 +55,11 @@ class TestMain:
         }
 
     @pytest.mark.parametrize(
-        ("args", "expects"),
+        ("args", "kwargs", "expects"),
         [
             (
                 ["enwiki_p"],
+                {},
                 {
                     "database": "enwiki_p",
                     "host": "enwiki.web.db.svc.wikimedia.cloud",
@@ -66,6 +67,7 @@ class TestMain:
             ),
             (
                 ["enwiki"],
+                {},
                 {
                     "database": "enwiki_p",
                     "host": "enwiki.web.db.svc.wikimedia.cloud",
@@ -73,6 +75,7 @@ class TestMain:
             ),
             (
                 ["enwiki", "analytics"],
+                {},
                 {
                     "database": "enwiki_p",
                     "host": "enwiki.analytics.db.svc.wikimedia.cloud",
@@ -80,26 +83,36 @@ class TestMain:
             ),
             (
                 ["meta", "analytics"],
+                {},
                 {
                     "database": "meta_p",
                     "host": "s7.analytics.db.svc.wikimedia.cloud",
                 },
             ),
+            (
+                ["wikidatawiki"],
+                {"extension": "termstore"},
+                {
+                    "database": "wikidatawiki_p",
+                    "host": "termstore.wikidatawiki.web.db.svc.wikimedia.cloud",
+                },
+            ),
         ],
     )
-    def test_connect(self, mocker, args, expects):
-        self._assert_connect(mocker, toolforge.connect, args, expects)
+    def test_connect(self, mocker, args, kwargs, expects):
+        self._assert_connect(mocker, toolforge.connect, args, kwargs, expects)
 
-    def _assert_connect(self, mocker, func, args, expect):
+    def _assert_connect(self, mocker, func, args, kwargs, expect):
         """Mock toolforge._connect and assert it is called as expected.
 
         :param func: Function to call after mocking toolforge._connect
-        :param args: Arguments for calling func
+        :param args: Positional arguments for calling func
+        :param kwargs: Keyword arguments for calling func
         :param expect: Dict of expected arguments to toolforge._connect
         """
         mm = mocker.patch("toolforge._connect")
         mm.return_value = None
-        conn = func(*args)
+        conn = func(*args, **kwargs)
         assert conn is None
         mm.assert_called_once_with(**expect)
 
@@ -109,6 +122,7 @@ class TestMain:
                 mocker,
                 toolforge.connect,
                 ["ignored", "not web or analytics"],
+                {},
                 {"ignored": "ignored"},
             )
 
@@ -132,7 +146,8 @@ class TestMain:
         ],
     )
     def test_toolsdb(self, mocker, args, expects):
-        self._assert_connect(mocker, toolforge.toolsdb, args, expects)
+        kwargs = {}
+        self._assert_connect(mocker, toolforge.toolsdb, args, kwargs, expects)
 
     def test_assert_private_file_no_args(self, mocker):
         load = mocker.Mock(
