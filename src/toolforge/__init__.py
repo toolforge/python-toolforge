@@ -74,6 +74,15 @@ def connect(
         host = f"{extension}.{host}"
     host = kwargs.pop("host", host)
 
+    try:
+        user = os.environ["TOOL_REPLICA_USER"]
+        password = os.environ["TOOL_REPLICA_PASSWORD"]
+    except KeyError:
+        kwargs.setdefault("read_default_file", os.path.expanduser("~/replica.my.cnf"))
+    else:
+        kwargs.setdefault("user", user)
+        kwargs.setdefault("password", password)
+
     return _connect(
         database=dbname + "_p",
         host=host,
@@ -84,7 +93,6 @@ def connect(
 def _connect(*args: str, **kwargs: str) -> _Connection:  # pragma: no cover
     """Wraper for pymysql.connect to make testing easier."""
     kw = {
-        "read_default_file": os.path.expanduser("~/replica.my.cnf"),
         "charset": "utf8mb4",
     }
     kw.update(kwargs)
@@ -98,6 +106,15 @@ def toolsdb(dbname: str, **kwargs: str) -> _Connection:
     :param `**kwargs`: For :meth:`pymysql.connect <pymysql.connections.Connection.__init__>`
     :return: :class:`pymysql.connections.Connection`
     """
+    try:
+        user = os.environ["TOOL_TOOLSDB_USER"]
+        password = os.environ["TOOL_TOOLSDB_PASSWORD"]
+    except KeyError:
+        kwargs.setdefault("read_default_file", os.path.expanduser("~/replica.my.cnf"))
+    else:
+        kwargs.setdefault("user", user)
+        kwargs.setdefault("password", password)
+
     return _connect(
         database=dbname,
         host="tools.db.svc.wikimedia.cloud",

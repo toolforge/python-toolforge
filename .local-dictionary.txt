@@ -4,6 +4,7 @@ MERCHANTABILITY
 Mehta
 PrivateFileWorldReadableError
 dbname
+delenv
 fileno
 func
 intersphinx
@@ -15,6 +16,7 @@ pygments
 pymysql
 qualname
 rtd
+setenv
 sitematrix
 tmp
 toolforge
