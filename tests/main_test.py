@@ -1,6 +1,7 @@
 #!/usr/bin/env python
 import io
 import json
+import os
 
 import pytest
 import requests
@@ -63,6 +64,7 @@ class TestMain:
                 {
                     "database": "enwiki_p",
                     "host": "enwiki.web.db.svc.wikimedia.cloud",
+                    "read_default_file": os.path.expanduser("~/replica.my.cnf"),
                 },
             ),
             (
@@ -71,6 +73,7 @@ class TestMain:
                 {
                     "database": "enwiki_p",
                     "host": "enwiki.web.db.svc.wikimedia.cloud",
+                    "read_default_file": os.path.expanduser("~/replica.my.cnf"),
                 },
             ),
             (
@@ -79,6 +82,7 @@ class TestMain:
                 {
                     "database": "enwiki_p",
                     "host": "enwiki.analytics.db.svc.wikimedia.cloud",
+                    "read_default_file": os.path.expanduser("~/replica.my.cnf"),
                 },
             ),
             (
@@ -87,6 +91,7 @@ class TestMain:
                 {
                     "database": "meta_p",
                     "host": "s7.analytics.db.svc.wikimedia.cloud",
+                    "read_default_file": os.path.expanduser("~/replica.my.cnf"),
                 },
             ),
             (
@@ -95,11 +100,75 @@ class TestMain:
                 {
                     "database": "wikidatawiki_p",
                     "host": "termstore.wikidatawiki.web.db.svc.wikimedia.cloud",
+                    "read_default_file": os.path.expanduser("~/replica.my.cnf"),
                 },
             ),
         ],
     )
     def test_connect(self, mocker, args, kwargs, expects):
+        self._assert_connect(mocker, toolforge.connect, args, kwargs, expects)
+
+    @pytest.mark.parametrize(
+        ("env", "expects"),
+        [
+            (
+                {
+                    "TOOL_REPLICA_USER": "user name",
+                    "TOOL_REPLICA_PASSWORD": "password",
+                },
+                {
+                    "user": "user name",
+                    "password": "password",
+                },
+            ),
+            (
+                {
+                    "TOOL_REPLICA_USER": None,
+                    "TOOL_REPLICA_PASSWORD": None,
+                },
+                {
+                    "read_default_file": os.path.expanduser("~/replica.my.cnf"),
+                },
+            ),
+            (
+                {
+                    "TOOL_REPLICA_USER": "unused user name",
+                    "TOOL_REPLICA_PASSWORD": None,
+                },
+                {
+                    "read_default_file": os.path.expanduser("~/replica.my.cnf"),
+                },
+            ),
+            (
+                {
+                    "TOOL_REPLICA_USER": None,
+                    "TOOL_REPLICA_PASSWORD": "unused password",
+                },
+                {
+                    "read_default_file": os.path.expanduser("~/replica.my.cnf"),
+                },
+            ),
+            (
+                {
+                    "TOOL_TOOLSDB_USER": "unused",
+                    "TOOL_TOOLSDB_PASSWORD": "(toolsdb != replica)",
+                },
+                {
+                    "read_default_file": os.path.expanduser("~/replica.my.cnf"),
+                },
+            ),
+        ],
+    )
+    def test_connect_env(self, mocker, monkeypatch, env, expects):
+        for name, value in env.items():
+            if value is None:
+                monkeypatch.delenv(name, raising=False)
+            else:
+                monkeypatch.setenv(name, value)
+        args = ["enwiki_p"]
+        kwargs = {}
+        expects["database"] = "enwiki_p"
+        expects["host"] = "enwiki.web.db.svc.wikimedia.cloud"
         self._assert_connect(mocker, toolforge.connect, args, kwargs, expects)
 
     def _assert_connect(self, mocker, func, args, kwargs, expect):
@@ -134,6 +203,7 @@ class TestMain:
                 {
                     "database": "s12345__foo",
                     "host": "tools.db.svc.wikimedia.cloud",
+                    "read_default_file": os.path.expanduser("~/replica.my.cnf"),
                 },
             ),
             (
@@ -141,12 +211,76 @@ class TestMain:
                 {
                     "database": "s12345__foo_p",
                     "host": "tools.db.svc.wikimedia.cloud",
+                    "read_default_file": os.path.expanduser("~/replica.my.cnf"),
                 },
             ),
         ],
     )
     def test_toolsdb(self, mocker, args, expects):
         kwargs = {}
+        self._assert_connect(mocker, toolforge.toolsdb, args, kwargs, expects)
+
+    @pytest.mark.parametrize(
+        ("env", "expects"),
+        [
+            (
+                {
+                    "TOOL_TOOLSDB_USER": "user name",
+                    "TOOL_TOOLSDB_PASSWORD": "password",
+                },
+                {
+                    "user": "user name",
+                    "password": "password",
+                },
+            ),
+            (
+                {
+                    "TOOL_TOOLSDB_USER": None,
+                    "TOOL_TOOLSDB_PASSWORD": None,
+                },
+                {
+                    "read_default_file": os.path.expanduser("~/replica.my.cnf"),
+                },
+            ),
+            (
+                {
+                    "TOOL_TOOLSDB_USER": "unused user name",
+                    "TOOL_TOOLSDB_PASSWORD": None,
+                },
+                {
+                    "read_default_file": os.path.expanduser("~/replica.my.cnf"),
+                },
+            ),
+            (
+                {
+                    "TOOL_TOOLSDB_USER": None,
+                    "TOOL_TOOLSDB_PASSWORD": "unused password",
+                },
+                {
+                    "read_default_file": os.path.expanduser("~/replica.my.cnf"),
+                },
+            ),
+            (
+                {
+                    "TOOL_REPLICA_USER": "unused",
+                    "TOOL_REPLICA_PASSWORD": "(toolsdb != replica)",
+                },
+                {
+                    "read_default_file": os.path.expanduser("~/replica.my.cnf"),
+                },
+            ),
+        ],
+    )
+    def test_toolsdb_env(self, mocker, monkeypatch, env, expects):
+        for name, value in env.items():
+            if value is None:
+                monkeypatch.delenv(name, raising=False)
+            else:
+                monkeypatch.setenv(name, value)
+        args = ["s12345__foo"]
+        kwargs = {}
+        expects["database"] = "s12345__foo"
+        expects["host"] = "tools.db.svc.wikimedia.cloud"
         self._assert_connect(mocker, toolforge.toolsdb, args, kwargs, expects)
 
     def test_assert_private_file_no_args(self, mocker):
