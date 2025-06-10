@@ -1,6 +1,8 @@
-UNRELEASED
+6.1.0
 ----------
 * Add assert_private_file() and, if PyYAML is installed, load_private_yaml()
+* Add support for extension databases to connect()
+* Get database credentials from toolforge envvars if available
 * Add project documentation built with sphinx
 * Publish project documentation at https://python-toolforge.readthedocs.io/
 * Update generated User-Agent header to use toolforge.org email address.
